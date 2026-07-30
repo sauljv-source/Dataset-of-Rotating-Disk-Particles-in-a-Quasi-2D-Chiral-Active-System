@@ -1,0 +1,106 @@
+{
+  "metadata": {
+    "title": "Granular gas of rotating disks: trajectory data of N=25 particles in a circular confinement at packing fraction 0.25",
+    "description": "Trajectory data from a granular gas experiment with rotating disk particles driven by air flow. The dataset contains particle positions (x, y) and orientation angle (theta) for N=25 particles at packing fraction 0.25. Recordings were performed at 900 fps using a high-speed camera. The data is provided in CSV format with one file per experimental condition. The confinement is circular with a diameter of 0.725 m.",
+    "access_right": "open",
+    "upload_type": "dataset",
+    "license": "cc-by-4.0",
+    "language": "eng",
+    "keywords": [
+      "granular matter",
+      "active matter",
+      "chiral active matter",
+      "rotating disks",
+      "particle tracking",
+      "granular gas",
+      "packing fraction",
+      "quasi-2D",
+      "trajectory data"
+    ],
+    "creators": [
+      {
+        "name": "Jimenez Vela, Saul",
+        "affiliation": "Universidad de Extremadura",
+        "orcid": "0009-0002-2923-7047"
+      }
+    ],
+    "references": [],
+    "publication_date": "",
+    "doi": "",
+    "experiment_id": "rotating_disk_N25_P25_pf25_fps900_d0baa24f_trajectories",
+    "date_recorded": "2038-01-19 08:06:03",
+    "recording": {
+      "original_filename": "serieAspas_N25_p25_fps900_est_renivel.cine",
+      "frame_width_px": 1280,
+      "frame_height_px": 800,
+      "fps": 900,
+      "exposure": 1109,
+      "exposure_units": "microseconds",
+      "n_frames": 24981,
+      "recording_time_s": 27.76
+    },
+    "camera": {
+      "model": "",
+      "distance_m": 0.95,
+      "pixel_ratio_px_per_m": 1075.86
+    },
+    "optics": {
+      "illumination_type": "far diffuse light",
+      "illumination_power": 25,
+      "illumination_power_units": "watts"
+    },
+    "particles": {
+      "N": 25,
+      "shape": "rotating disk",
+      "material": "",
+      "diameter_px": 78,
+      "diameter_m": 0.0725
+    },
+    "system": {
+      "confinement_shape": "circle",
+      "system_diameter_m": 0.725,
+      "packing_fraction": 0.25,
+      "boundary_conditions": "solid wall (no-slip)"
+    },
+    "medium": {
+      "viscosity_pas": null,
+      "temperature_k": null,
+      "confinement_height_m": null
+    },
+    "air_flow": {
+      "description": "air flow from below to fluidize particles (2.7981 m/s)",
+      "pressure": "",
+      "flow_rate": "",
+      "flow_rate_units": ""
+    },
+    "roi": {
+      "center_x_px": 656,
+      "center_y_px": 395,
+      "radius_px": 408,
+      "origin": "top-left corner of frame"
+    },
+    "tracking": {
+      "method": "centroid-based tracking",
+      "spatial_resolution_m_per_px": 0.000929,
+      "temporal_resolution_fps": 900,
+      "total_observation_time_s": 27.76,
+      "n_trajectories": 25,
+      "localization_error_px": "",
+      "trajectory_completeness_pct": ""
+    },
+    "units": {
+      "position": "pixels (relative to ROI center)",
+      "theta": "radians [0, 2pi)",
+      "time": "seconds (frame / fps)"
+    },
+    "quality_indicators": {
+      "mean_trajectory_length_frames": 24981,
+      "signal_to_noise_ratio": "",
+      "boundary_artifact_zones": ""
+    },
+    "associated_files": {
+      "trajectory_file": "rotating_disk_N25_P25_pf25_fps900_d0baa24f_trajectories.csv",
+      "code_repository": ""
+    }
+  }
+}

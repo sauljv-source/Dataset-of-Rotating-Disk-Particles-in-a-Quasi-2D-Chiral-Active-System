@@ -1,0 +1,30 @@
+{
+  "metadata": {
+    "title": "Experimental Trajectory Dataset of Rotating Disk Particles in a Quasi-2D Granular System",
+    "description": "Comprehensive trajectory dataset from a quasi-2D granular gas experiments with rotating disk particles driven by air flow. The dataset contains particle positions (x, y) and orientation angles (theta) for multiple experimental conditions including variations in particle count (N), packing fraction, and recording framerate. Data is provided in CSV format with one file per experimental condition.",
+    "access_right": "open",
+    "upload_type": "dataset",
+    "license": "cc-by-4.0",
+    "language": "eng",
+    "keywords": [
+      "granular matter",
+      "active matter",
+      "chiral active matter",
+      "rotating disks",
+      "particle tracking",
+      "granular gas",
+      "packing fraction",
+      "quasi-2D",
+      "trajectory data"
+    ],
+    "creators": [
+      {
+        "name": "Jimenez Vela, Saul",
+        "affiliation": "Universidad de Extremadura",
+        "orcid": "0009-0002-2923-7047"
+      }
+    ],
+    "publication_date": "2026-07-30",
+    "notes": "This deposit contains multiple experiments. Each experiment has a CSV trajectory file and a metadata JSON file, both identified by a unique experiment ID in the filename."
+  }
+}
