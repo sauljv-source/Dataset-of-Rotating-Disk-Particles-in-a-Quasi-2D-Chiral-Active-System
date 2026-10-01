@@ -212,7 +212,7 @@ def build_experiment_metadata(
             {
                 "name": "Vega Reyes, Francisco",
                 "affiliation": "Universidad de Extremadura",
-                "role": "Supervisor",
+                "type": "Supervisor",
                 "orcid": "",
             },
         ],

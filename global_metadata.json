@@ -32,11 +32,11 @@
       {
         "name": "Vega Reyes, Francisco",
         "affiliation": "Universidad de Extremadura",
-        "role": "Supervisor",
+        "type": "Supervisor",
         "orcid": ""
       }
     ],
-    "publication_date": "2026-09-24",
+    "publication_date": "2026-10-01",
     "notes": "This deposit contains multiple experiments. Each experiment has a CSV trajectory file and a metadata JSON file, both identified by a unique experiment ID in the filename.",
     "related_identifiers": [
       {
