@@ -1,27 +1,39 @@
 {
   "metadata": {
-    "title": "Granular gas of rotating disks: trajectory data of N=25 particles in a circular confinement at packing fraction 0.25",
-    "description": "Trajectory data from a granular gas experiment with rotating disk particles driven by air flow. The dataset contains particle positions (x, y) and orientation angle (theta) for N=25 particles at packing fraction 0.25. Recordings were performed at 900 fps using a high-speed camera. The data is provided in CSV format with one file per experimental condition. The confinement is circular with a diameter of 0.725 m.",
+    "title": "Chiral active fluid of rotating disks: trajectory data of N=25 particles in a circular confinement at packing fraction 0.25",
+    "description": "Trajectory data from a chiral active fluid experiment with rotating disk particles driven by air flow. The dataset contains particle positions (x, y) and orientation angle (theta) for N=25 particles at packing fraction 0.25. Recordings were performed at 900 fps using a high-speed camera. The data is provided in CSV format with one file per experimental condition. The confinement is circular with a diameter of 0.725 m.",
     "access_right": "open",
     "upload_type": "dataset",
     "license": "cc-by-4.0",
     "language": "eng",
     "keywords": [
-      "granular matter",
       "active matter",
       "chiral active matter",
+      "chiral fluids",
+      "active chiral fluids",
+      "active spinners",
+      "chiral spinners",
       "rotating disks",
       "particle tracking",
-      "granular gas",
       "packing fraction",
       "quasi-2D",
-      "trajectory data"
+      "trajectory data",
+      "macroscopic active matter",
+      "soft matter"
     ],
     "creators": [
       {
         "name": "Jimenez Vela, Saul",
         "affiliation": "Universidad de Extremadura",
         "orcid": "0009-0002-2923-7047"
+      }
+    ],
+    "contributors": [
+      {
+        "name": "Vega Reyes, Francisco",
+        "affiliation": "Universidad de Extremadura",
+        "role": "Supervisor",
+        "orcid": ""
       }
     ],
     "references": [],

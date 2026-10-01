@@ -1,4 +1,4 @@
-TFG project: tracking data from rotating disk particles in a quasi-2D granular gas. Particles are fluidized with air flow and recorded with a high-speed camera.
+TFG project: tracking data from rotating disk particles in a quasi-2D chiral active fluid. Particles are fluidized with air flow and recorded with a high-speed camera.
 
 Each experiment gives you a csv (frame, particle, x, y, theta) and a json with metadata.
 

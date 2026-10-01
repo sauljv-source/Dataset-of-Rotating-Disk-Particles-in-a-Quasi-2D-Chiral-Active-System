@@ -1,6 +1,8 @@
 # Test static graphics
 # Executed for each experiment, does not take long to run
 
+import matplotlib
+matplotlib.use('Agg')
 import json
 import argparse
 from pathlib import Path

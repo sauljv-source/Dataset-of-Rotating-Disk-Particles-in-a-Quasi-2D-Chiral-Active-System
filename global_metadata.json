@@ -1,21 +1,25 @@
 {
   "metadata": {
-    "title": "Experimental Trajectory Dataset of Rotating Disk Particles in a Quasi-2D Granular System",
-    "description": "Comprehensive trajectory dataset from a quasi-2D granular gas experiments with rotating disk particles driven by air flow. The dataset contains particle positions (x, y) and orientation angles (theta) for multiple experimental conditions including variations in particle count (N), packing fraction, and recording framerate. Data is provided in CSV format with one file per experimental condition.",
+    "title": "Experimental Trajectory Dataset of Rotating Disk Particles in a Quasi-2D Chiral Active Fluid",
+    "description": "Comprehensive trajectory dataset from quasi-2D chiral active fluid experiments featuring chiral rotating disk particles driven by bottom air flow.\n\n### Data Contents\n- Particle positions (x, y) in mm/pixels and orientation angle (theta) in radians.\n- Variations in particle count (N), packing fraction (phi), and frame rate (FPS).\n- Each experiment contains a matching trajectory CSV file and a metadata JSON file.\n\n### Hardware & Code\nCode for tracking and data analysis is available on GitHub (see Related Identifiers).",
     "access_right": "open",
     "upload_type": "dataset",
     "license": "cc-by-4.0",
     "language": "eng",
     "keywords": [
-      "granular matter",
       "active matter",
       "chiral active matter",
+      "chiral fluids",
+      "active chiral fluids",
+      "active spinners",
+      "chiral spinners",
       "rotating disks",
       "particle tracking",
-      "granular gas",
       "packing fraction",
       "quasi-2D",
-      "trajectory data"
+      "trajectory data",
+      "macroscopic active matter",
+      "soft matter"
     ],
     "creators": [
       {
@@ -24,7 +28,28 @@
         "orcid": "0009-0002-2923-7047"
       }
     ],
-    "publication_date": "2026-07-30",
-    "notes": "This deposit contains multiple experiments. Each experiment has a CSV trajectory file and a metadata JSON file, both identified by a unique experiment ID in the filename."
+"contributors": [
+      {
+        "name": "Vega Reyes, Francisco",
+        "affiliation": "Universidad de Extremadura",
+        "role": "Supervisor",
+        "orcid": ""
+      }
+    ],
+    "publication_date": "2026-09-24",
+    "notes": "This deposit contains multiple experiments. Each experiment has a CSV trajectory file and a metadata JSON file, both identified by a unique experiment ID in the filename.",
+    "related_identifiers": [
+      {
+        "relation": "isSupplementTo",
+        "identifier": "https://github.com/sauljv-source/Dataset-of-Rotating-Disk-Particles-in-a-Quasi-2D-Chiral-Active-System",
+        "scheme": "url",
+        "resource_type": "software"
+      }
+    ],
+    "communities": [
+      {
+        "identifier": "soft-matter"
+      }
+    ]
   }
 }

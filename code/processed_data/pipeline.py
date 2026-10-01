@@ -54,9 +54,9 @@ def load_experiments_table(ods_path):
         print(f"Could not read experiments table: {e}")
         return None
 
-# Searches for the pkl hash with matching fps in the experiments table
+# Searches for the pkl hash in the experiments table
 
-def lookup_experiment(pkl_path, fps, table):
+def lookup_experiment(pkl_path, table):
     stem = Path(pkl_path).stem
     for suffix in ["_w", "_raw", "_processed"]:
         if stem.endswith(suffix):
@@ -67,9 +67,7 @@ def lookup_experiment(pkl_path, fps, table):
         return None
     if len(matches) == 1:
         return matches.iloc[0].to_dict()
-    matches = matches.copy()
-    matches["_fps_diff"] = abs(matches["fps"].astype(int) - fps)
-    return matches.sort_values("_fps_diff").iloc[0].to_dict()
+    raise ValueError(f"Duplicate rows in the experiments table for ID: {stem}")
 
 
 def discover_pkl_files(input_dir, pattern="*_w.pkl", max_files=None):
@@ -100,7 +98,7 @@ def generate_fair_filename(exp_row, config):
         N = config.get("n_particles") or 0
         P = None
         phi = config.get("packing_fraction") or 0
-        fps = config.get("fps_default") or 0
+        fps = 0
         exp_id = None
 
     shape_str = shape.replace(" ", "_")
@@ -174,11 +172,11 @@ def build_experiment_metadata(
     phi_str = f"{phi:.2f}" if phi is not None else "?"
     shape_str = (pkl_meta or {}).get("particle_shape", "rotating disk")
     title = (
-        f"Granular gas of rotating disks: trajectory data of N={N_str} particles "
+        f"Chiral active fluid of rotating disks: trajectory data of N={N_str} particles "
         f"in a circular confinement at packing fraction {phi_str}"
     )
     description = (
-        f"Trajectory data from a granular gas experiment with {shape_str} particles "
+        f"Trajectory data from a chiral active fluid experiment with {shape_str} particles "
         f"driven by air flow. The dataset contains particle positions (x, y) and "
         f"orientation angle (theta) for N={N_str} particles "
         f"at packing fraction {phi_str}. "
@@ -199,15 +197,23 @@ def build_experiment_metadata(
         "license": "cc-by-4.0",
         "language": "eng",
         "keywords": [
-            "granular matter", "active matter", "chiral active matter",
-            "rotating disks", "particle tracking", "granular gas",
-            "packing fraction", "quasi-2D", "trajectory data",
+            "active matter", "chiral active matter", "chiral fluids", "active chiral fluids",
+            "active spinners", "chiral spinners", "rotating disks", "particle tracking",
+            "packing fraction", "quasi-2D", "trajectory data", "macroscopic active matter", "soft matter",
         ],
         "creators": [
             {
                 "name": "Jimenez Vela, Saul",
                 "affiliation": "Universidad de Extremadura",
                 "orcid": "0009-0002-2923-7047",
+            },
+        ],
+        "contributors": [
+            {
+                "name": "Vega Reyes, Francisco",
+                "affiliation": "Universidad de Extremadura",
+                "role": "Supervisor",
+                "orcid": "",
             },
         ],
         "references": [],
@@ -400,10 +406,12 @@ def process_single_pkl(pkl_path, config):
 
     try:
         # Search for the experiment in the .ods table
-        exp_row = None
-        if config.get("_exp_table") is not None:
-            exp_row = lookup_experiment(pkl_path, config["fps_default"], config["_exp_table"])
-            config["_exp_row"] = exp_row
+        if config.get("_exp_table") is None:
+            raise RuntimeError("Experiments table (.ods) not loaded; cannot process experiment")
+        exp_row = lookup_experiment(pkl_path, config["_exp_table"])
+        config["_exp_row"] = exp_row
+        if exp_row is None:
+            raise RuntimeError(f"Experiment {pkl_path.name} not found in the .ods table")
         # Load metadata from the attached .txt file
         pkl_meta = try_load_metadata(pkl_path)
         config["_pkl_meta"] = pkl_meta
@@ -416,8 +424,9 @@ def process_single_pkl(pkl_path, config):
         selected_cols = ["frame", "track", "x", "y", "theta", "w", "vx", "vy"]
         df = df[selected_cols].copy()
 
-        # Convert theta from blades to radians, w from blades/frame to rad/s
-        fps = config.get("fps_default", 900)
+        # Convert theta from blades to radians, w from blades/frame to rad/s.
+        # fps always comes from the actual experiment row in the .ods table.
+        fps = int(exp_row["fps"])
         BLADES_PER_REVOLUTION = 14
         factor = 2 * np.pi / BLADES_PER_REVOLUTION
         df["theta"] = df["theta"] * factor
@@ -549,7 +558,6 @@ def run(input_dir, output_dir=None, force=False, max_files=None):
         Path(d).mkdir(parents=True, exist_ok=True)
 
     config = {
-        "fps_default": 900,
         "skip_existing_csv": not force,
         "output_resultados": str(output_resultados),
         "output_metrics": str(output_metrics),
