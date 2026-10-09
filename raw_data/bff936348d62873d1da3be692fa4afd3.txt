@@ -1,0 +1,29 @@
+{
+"experiment_id": "bff936348d62873d1da3be692fa4afd3",
+"original_file": "C:/Users/Alejandro.Explosivos/Documents/UNEX/Last_process_25_06_2020\\serieAspas_N3_p23_fps900_est_renivel.cine",
+"date": "2038-01-19 06:26:34",
+"shape": [
+1280,
+800
+],
+"fps": 900,
+"exposure": 1109,
+"n_frames": 24981,
+"recording_time": 27.756666666666668,
+"camera_distance": 0.95,
+"pixel_ratio": 1075.8620689655172,
+"particle_diameter_px": 78,
+"N": 3,
+"particle_shape": "rotating disk",
+"particle_diameter_m": 0.0725,
+"system_diameter": 0.725,
+"packing_fraction": 0.029999999999999995,
+"lights": "luzLejana",
+"power": 23,
+"associated_code": "C:/Users/Alejandro.Explosivos/Documents/UNEX/Last_process_25_06_2020/bff936348d62873d1da3be692fa4afd3_code.zip",
+"ROI_center": [
+656,
+395
+],
+"ROI_radius": 408
+}

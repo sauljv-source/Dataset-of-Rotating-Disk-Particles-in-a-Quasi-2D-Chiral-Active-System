@@ -21,16 +21,17 @@ def auto_find_csv():
     return csv_files[-1] if csv_files else None
 
 
-def load_data(csv_path):
+def load_data(csv_path, quiet=False):
     if not csv_path.exists():
         print(f"Not found {csv_path}")
         exit(1)
     df = pd.read_csv(csv_path)
-    print("Data loaded:", len(df), "rows,", df["particle"].nunique(), "particles")
+    if not quiet:
+        print("Data loaded:", len(df), "rows,", df["particle"].nunique(), "particles")
     return df
 
 
-def load_experiment_metadata(csv_path):
+def load_experiment_metadata(csv_path, quiet=False):
     meta_path = csv_path.with_name(csv_path.name.replace("_trajectories.csv", "_metadata.json"))
     if not meta_path.exists():
         print(f"Not found {meta_path}")
@@ -42,7 +43,8 @@ def load_experiment_metadata(csv_path):
     roi_radius = m["roi"]["radius_px"]
     part_diameter = m["particles"]["diameter_px"]
     part_radius = part_diameter // 2
-    print(f"Metadata loaded: fps={fps}, roi_radius={roi_radius}, part_radius={part_radius}")
+    if not quiet:
+        print(f"Metadata loaded: fps={fps}, roi_radius={roi_radius}, part_radius={part_radius}")
     return {"fps": fps, "roi_radius_px": roi_radius, "particle_diameter_px": part_diameter, "part_radius": part_radius}
 
 
@@ -95,7 +97,7 @@ def make_animation_bodies_tracked(df, output_dir, filename="animation_bodies_tra
 
     trails, curr_positions, _, n_frames = _build_trails(df, all_frames, tracks, trail_length)
 
-    fig, ax = plt.subplots(figsize=(10, 10))
+    fig, ax = plt.subplots(figsize=(10.08, 10.08))
 
     wall = plt.Circle((0, 0), roi_radius, fill=False, edgecolor="crimson", linestyle="--", linewidth=2)
     ax.add_patch(wall)
@@ -175,7 +177,7 @@ def make_animation_bodies_tracked(df, output_dir, filename="animation_bodies_tra
     writer.close()
     plt.close(fig)
 
-def run(csv_path, output_dir=None, step=30, trail_length=50, fps_output=30, max_frames=None):
+def run(csv_path, output_dir=None, step=30, trail_length=50, fps_output=30, max_frames=None, quiet=False):
     csv_path = Path(csv_path) if csv_path else auto_find_csv()
     if not csv_path or not csv_path.exists():
         print("Error, no --input provided nor CSV found in data folder")
@@ -188,15 +190,16 @@ def run(csv_path, output_dir=None, step=30, trail_length=50, fps_output=30, max_
         output_dir = Path(output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    df = load_data(csv_path)
-    meta = load_experiment_metadata(csv_path)
+    df = load_data(csv_path, quiet=quiet)
+    meta = load_experiment_metadata(csv_path, quiet=quiet)
     roi_radius = meta["roi_radius_px"]
     part_radius = meta["part_radius"]
     fps = meta["fps"]
 
     make_animation_bodies_tracked(df, output_dir, filename="animation_bodies_tracked.mp4", step=step, trail_length=trail_length, fps_input=fps, fps_output=fps_output, max_frames=max_frames, roi_radius=roi_radius, part_radius=part_radius)
 
-    print(f"\nAll videos generated in: {output_dir}")
+    if not quiet:
+        print(f"\nAll videos generated in: {output_dir}")
 
 
 if __name__ == "__main__":

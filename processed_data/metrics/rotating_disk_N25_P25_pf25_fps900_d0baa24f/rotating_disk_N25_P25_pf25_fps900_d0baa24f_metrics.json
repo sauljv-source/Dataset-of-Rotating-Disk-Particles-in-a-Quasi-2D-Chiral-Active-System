@@ -1,12 +1,12 @@
 {
-  "mean_angular_velocity": -128.05435215919113,
-  "std_angular_velocity": 21.13689852649501,
-  "net_chirality": -0.998266062999711,
-  "abs_mean_w": 128.32008420671787,
-  "mean_speed_px_per_s": 0.40155995943868317,
+  "mean_angular_velocity": 128.0561558369595,
+  "std_angular_velocity": 9.659177612052288,
+  "net_chirality": 0.9975427442510525,
+  "abs_mean_w": 128.23612753629368,
+  "mean_speed_px_per_s": 121.05548119104931,
   "n_particles": 25,
   "n_frames": 24975,
   "fps": 900,
-  "curvature_radius_px": 0.003129361720116924,
+  "curvature_radius_px": 0.9440044979273716,
   "rotational_diffusion_coefficient": 4.671012177794926
 }

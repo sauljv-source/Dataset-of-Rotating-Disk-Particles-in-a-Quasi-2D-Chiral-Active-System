@@ -1,0 +1,29 @@
+{
+"experiment_id": "a7720cc40224188bc328d4f419fb5e37",
+"original_file": "/mnt/beegfs/malopez/serieAspas/serieAspas_N3_p20_fps900_1.cine",
+"date": "2038-01-19 04:36:56",
+"shape": [
+1280,
+800
+],
+"fps": 900,
+"exposure": 1109,
+"n_frames": 24981,
+"recording_time": 27.756666666666668,
+"camera_distance": 0.95,
+"pixel_ratio": 1089,
+"particle_diameter_px": 79,
+"N": 3,
+"particle_shape": "rotating disk",
+"particle_diameter_m": 0.0725,
+"system_diameter": 0.725,
+"packing_fraction": 0.029999999999999995,
+"lights": "luzLejana",
+"power": 20,
+"associated_code": "/mnt/beegfs/malopez/serieAspas/a7720cc40224188bc328d4f419fb5e37_code.zip",
+"ROI_center": [
+656,
+395
+],
+"ROI_radius": 408
+}

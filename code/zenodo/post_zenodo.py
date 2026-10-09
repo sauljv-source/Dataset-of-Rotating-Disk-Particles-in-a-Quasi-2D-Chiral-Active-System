@@ -1,14 +1,15 @@
-# Automatic script to upload global JSON as metadata and .csv + .json for each experiment as downloadable files
-# Zip?
+# Automatic script to build one ZIP with the .csv and .json of each experiment and upload it to Zenodo Sandbox
 
 import requests
 import os
 import json
+import zipfile
 from dotenv import load_dotenv
 from pathlib import Path
 
 
 URL = "https://sandbox.zenodo.org/api/deposit/depositions"
+ZIP_NAME = "rotating_disk_dataset.zip"
 
 
 def run():
@@ -37,6 +38,10 @@ def run():
     with open(global_metadata_file, "r", encoding="utf-8") as f:
         metadata = json.load(f)
 
+    if not dataset_dir.is_dir():
+        print(f"Directory not found: {dataset_dir}")
+        exit(1)
+
     exp_folders = sorted([
         p for p in dataset_dir.iterdir()
         if p.is_dir() and list(p.glob("*_trajectories.csv"))
@@ -48,6 +53,26 @@ def run():
 
     print(f"Experiments found: {len(exp_folders)}")
 
+    zip_path = dataset_dir.parent / ZIP_NAME
+    n_fail = 0
+    n_files = 0
+
+    print(f"\nBuilding ZIP: {zip_path}")
+    with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zf:
+        for folder in exp_folders:
+            csv_files = sorted(folder.glob("*_trajectories.csv"))
+            meta_files = sorted(folder.glob("*_metadata.json"))
+
+            if not meta_files:
+                print(f"No metadata found in {folder.name}.")
+                n_fail += 1
+
+            for file_path in csv_files + meta_files:
+                zf.write(file_path, arcname=f"{folder.name}/{file_path.name}")
+                n_files += 1
+
+    print(f"ZIP built: {zip_path} ({zip_path.stat().st_size / 1048576:.1f} MB, {n_files} files)")
+
     r = requests.post(URL, json={}, headers=json_headers)
     print(f"\nServer status code: {r.status_code}")
     if r.status_code == 201:
@@ -58,64 +83,37 @@ def run():
         print(f"Deposit created successfully. ID: {data_id}")
     else:
         print(f"The server rejected the request: {r.text}")
+        print(f"\nUpload finished: {n_files} files in 1 ZIP, {n_fail + 1} failures")
         exit(1)
 
-    n_fail = 0
+    with open(zip_path, "rb") as fp:
+        r_file = requests.put(f"{data_url}/{ZIP_NAME}", data=fp, headers=file_headers)
 
-    for folder in exp_folders:
-        exp_name = folder.name
-
-        csv_files = list(folder.glob("*_trajectories.csv"))
-        meta_files = list(folder.glob("*_metadata.json"))
-
-        if not csv_files:
-            print(f"No CSV found in {exp_name}, skipping.")
-            n_fail += 1
-            continue
-
-        csv_path = csv_files[0]
-        csv_name = csv_path.name
-        csv_url = f"{data_url}/{csv_name}"
-
-        with open(csv_path, "rb") as fp:
-            r_file = requests.put(csv_url, data=fp, headers=file_headers)
-
-        if r_file.status_code in [200, 201]:
-            pass
-        else:
-            print(f"Error uploading CSV {csv_name}: {r_file.text}")
-            n_fail += 1
-            continue
-
-        if meta_files:
-            meta_path = meta_files[0]
-            meta_name = meta_path.name
-            meta_url = f"{data_url}/{meta_name}"
-
-            with open(meta_path, "rb") as fp:
-                r_meta = requests.put(meta_url, data=fp, headers=file_headers)
-
-            if r_meta.status_code in [200, 201]:
-                pass
-            else:
-                print(f"Error uploading metadata {meta_name}: {r_meta.text}")
-
-
-    print(f"\nUploaded files: {n_fail} failures")
+    if r_file.status_code not in (200, 201):
+        print(f"Error uploading ZIP {ZIP_NAME}: {r_file.text}")
+        print(f"\nUpload finished: {n_files} files in 1 ZIP, {n_fail + 1} failures")
+        exit(1)
 
     r_metadata = requests.put(f"{URL}/{data_id}", headers=json_headers, json=metadata)
     if r_metadata.status_code == 200:
         print("Global metadata saved successfully.")
     else:
         print(f"Error updating global metadata: {r_metadata.text}")
+        n_fail += 1
+
+    if n_fail:
+        print(f"\nUpload finished: {n_files} files in 1 ZIP, {n_fail} failures")
         exit(1)
 
     r_publication = requests.post(f"{URL}/{data_id}/actions/publish", headers=json_headers)
     if r_publication.status_code == 202:
         print("\nDeposit officially published on Zenodo Sandbox.")
         print(f"Web link: {r_publication.json().get('links', {}).get('html', 'Not available')}")
+        print(f"\nUpload finished: {n_files} files in 1 ZIP, no failures")
     else:
         print(f"Error publishing: {r_publication.text}")
+        print(f"\nUpload finished: {n_files} files in 1 ZIP, 1 failure")
+        exit(1)
 
 
 if __name__ == "__main__":

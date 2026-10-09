@@ -20,16 +20,17 @@ def auto_find_csv():
     return csv_files[-1] if csv_files else None
 
 
-def load_data(csv_path):
+def load_data(csv_path, quiet=False):
     if not csv_path.exists():
         print(f"Not found {csv_path}")
         exit(1)
     df = pd.read_csv(csv_path)
-    print("Data loaded:", len(df), "rows,", df["particle"].nunique(), "particles")
+    if not quiet:
+        print("Data loaded:", len(df), "rows,", df["particle"].nunique(), "particles")
     return df
 
 
-def load_experiment_metadata(csv_path):
+def load_experiment_metadata(csv_path, quiet=False):
     meta_path = csv_path.with_name(csv_path.name.replace("_trajectories.csv", "_metadata.json"))
     if not meta_path.exists():
         print(f"Not found {meta_path}")
@@ -41,7 +42,8 @@ def load_experiment_metadata(csv_path):
     roi_radius = m["roi"]["radius_px"]
     part_diameter = m["particles"]["diameter_px"]
     part_radius = part_diameter // 2
-    print(f"Metadata loaded: fps={fps}, roi_radius={roi_radius}, part_radius={part_radius}")
+    if not quiet:
+        print(f"Metadata loaded: fps={fps}, roi_radius={roi_radius}, part_radius={part_radius}")
     return {"fps": fps, "roi_radius_px": roi_radius, "particle_diameter_px": part_diameter, "part_radius": part_radius}
 
 
@@ -248,7 +250,7 @@ def plot_chirality_metrics(w, df, output_dir, fps):
     plt.close(fig)
 
 
-def run(csv_path, output_dir=None):
+def run(csv_path, output_dir=None, quiet=False):
     csv_path = Path(csv_path) if csv_path else auto_find_csv()
     if not csv_path:
         print("No --input provided nor CSV found in data")
@@ -263,8 +265,8 @@ def run(csv_path, output_dir=None):
         
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    df = load_data(csv_path)
-    meta = load_experiment_metadata(csv_path)
+    df = load_data(csv_path, quiet=quiet)
+    meta = load_experiment_metadata(csv_path, quiet=quiet)
     roi_radius = meta["roi_radius_px"]
     part_radius = meta["part_radius"]
     fps = meta["fps"]
@@ -285,7 +287,8 @@ def run(csv_path, output_dir=None):
         raise FileNotFoundError(f"Filtered angular velocity file '{w_path}' does not exist.")
     plot_chirality_metrics(w, df, output_dir, fps)
 
-    print(f"\nAll static plots generated in: {output_dir}")
+    if not quiet:
+        print(f"\nAll static plots generated in: {output_dir}")
 
 
 if __name__ == "__main__":

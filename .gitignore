@@ -3,6 +3,7 @@
 env/
 .env
 raw_data/prueba/
+processed_data/*.zip
 documents/
 reports/
 metadata_proposals/

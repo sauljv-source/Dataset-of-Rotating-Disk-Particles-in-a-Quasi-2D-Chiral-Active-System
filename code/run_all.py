@@ -46,35 +46,57 @@ def main():
         print(f"Error, no experiments found in: {results_dir}")
         exit(1)
 
-    n_fail = 0
-    for exp_dir in exp_dirs:
+    plot_fail = 0
+    video_fail = 0
+    plot_fail_names = []
+    video_fail_names = []
+    total = len(exp_dirs)
+
+    # Final plots (all experiments)
+    print("\nStep 2: Plots\n")
+    for i, exp_dir in enumerate(exp_dirs, 1):
         exp_name = os.path.basename(exp_dir)
         graphics_dir = os.path.join(exp_dir, "graphics")
         os.makedirs(graphics_dir, exist_ok=True)
 
         csv_path = os.path.join(exp_dir, exp_name + "_trajectories.csv")
         if not os.path.exists(csv_path):
-            print(f"\nWarning, file not found: {csv_path}")
-            n_fail += 1
+            print(f"[{i}/{total}] {exp_name}")
+            print(f"Warning, file not found: {csv_path}")
+            plot_fail += 1
+            plot_fail_names.append(exp_name)
             continue
 
-        # Final plots
-        print("\nStep 2: Plots\n")
+        print(f"[{i}/{total}] {exp_name}")
         try:
-            static_plots_run(csv_path, output_dir=graphics_dir)
+            static_plots_run(csv_path, output_dir=graphics_dir, quiet=True)
         except Exception as e:
             print(f"Error in static plots for {exp_name} : {e}")
-            n_fail += 1
+            plot_fail += 1
+            plot_fail_names.append(exp_name)
+
+    # Test animation (all experiments)
+    print("\nStep 3: Video\n")
+    for i, exp_dir in enumerate(exp_dirs, 1):
+        exp_name = os.path.basename(exp_dir)
+        graphics_dir = os.path.join(exp_dir, "graphics")
+        os.makedirs(graphics_dir, exist_ok=True)
+
+        csv_path = os.path.join(exp_dir, exp_name + "_trajectories.csv")
+        if not os.path.exists(csv_path):
+            print(f"[{i}/{total}] {exp_name}")
+            print(f"Warning, file not found: {csv_path}")
+            video_fail += 1
+            video_fail_names.append(exp_name)
             continue
 
-        # Test animation
-        print("\nStep 3: Video\n")
+        print(f"[{i}/{total}] {exp_name}")
         try:
-            video_run(csv_path, output_dir=graphics_dir)
+            video_run(csv_path, output_dir=graphics_dir, quiet=True)
         except Exception as e:
             print(f"Error in videos for {exp_name} : {e}")
-            n_fail += 1
-            continue
+            video_fail += 1
+            video_fail_names.append(exp_name)
 
     # Zenodo upload
     print("\nStep 4: Upload to Zenodo Sandbox\n")
@@ -88,7 +110,13 @@ def main():
     else:
         print("Upload to Zenodo skipped by --skip-zenodo")
 
-    print(f"\nProcess finished: failures = {n_fail}")
+    print(f"\nProcess finished")
+    print(f"  Plots:  {total - plot_fail}/{total} OK, {plot_fail} fail")
+    if plot_fail:
+        print(f"    Failed experiments (plots): {', '.join(plot_fail_names)}")
+    print(f"  Videos: {total - video_fail}/{total} OK, {video_fail} fail")
+    if video_fail:
+        print(f"    Failed experiments (videos): {', '.join(video_fail_names)}")
     print(f"Experiments saved to: {results_dir}\n")
 
 if __name__ == "__main__":

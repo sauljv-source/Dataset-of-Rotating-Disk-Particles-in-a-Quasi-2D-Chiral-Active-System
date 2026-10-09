@@ -1,7 +1,7 @@
 {
   "metadata": {
     "title": "Experimental Trajectory Dataset of Rotating Disk Particles in a Quasi-2D Chiral Active Fluid",
-    "description": "Comprehensive trajectory dataset from quasi-2D chiral active fluid experiments featuring chiral rotating disk particles driven by bottom air flow.\n\n### Data Contents\n- Particle positions (x, y) in mm/pixels and orientation angle (theta) in radians.\n- Variations in particle count (N), packing fraction (phi), and frame rate (FPS).\n- Each experiment contains a matching trajectory CSV file and a metadata JSON file.\n\n### Hardware & Code\nCode for tracking and data analysis is available on GitHub (see Related Identifiers).",
+    "description": "Comprehensive trajectory dataset from quasi-2D chiral active fluid experiments featuring chiral rotating disk particles driven by bottom air flow.\n\nThe dataset includes:\n- Particle positions (x, y) and orientation angle (theta) in radians for each experiment.\n- Variations in particle count (N), packing fraction (phi) and recording frame rate (FPS).\n- One CSV trajectory file and one metadata JSON file per experiment, all packed in a single ZIP archive.\n\nTracking and analysis code is available on GitHub, linked in Related identifiers.",
     "access_right": "open",
     "upload_type": "dataset",
     "license": "cc-by-4.0",
@@ -37,7 +37,7 @@
       }
     ],
     "publication_date": "2026-10-01",
-    "notes": "This deposit contains multiple experiments. Each experiment has a CSV trajectory file and a metadata JSON file, both identified by a unique experiment ID in the filename.",
+    "notes": "This deposit contains multiple experiments. Each experiment has a CSV trajectory file and a metadata JSON file, both identified by a unique experiment ID in the filename. All files are provided as a single ZIP archive.",
     "related_identifiers": [
       {
         "relation": "isSupplementTo",

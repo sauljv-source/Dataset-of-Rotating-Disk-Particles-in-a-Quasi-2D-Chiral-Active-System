@@ -350,9 +350,9 @@ def build_experiment_metadata(
             roi["radius_px"] = int(pkl_meta["ROI_radius"])
 
         trk = meta["tracking"]
-        if "particle_diameter_px" in pkl_meta and "camera_distance" in pkl_meta:
+        if "particle_diameter_px" in pkl_meta and "particle_diameter_m" in pkl_meta:
             trk["spatial_resolution_m_per_px"] = round(
-                float(pkl_meta.get("particle_diameter_m", 0))
+                float(pkl_meta["particle_diameter_m"])
                 / float(pkl_meta["particle_diameter_px"]),
                 6,
             ) if pkl_meta.get("particle_diameter_px", 0) else None
@@ -368,11 +368,6 @@ def build_experiment_metadata(
         u_air = _safe(exp_row.get("u_air"), float)
         if u_air is not None:
             air["description"] = f"air flow from below to fluidize particles ({u_air} m/s)"
-
-        if meta["recording"]["recording_time_s"] is None:
-            Tt = _safe(exp_row.get("Tt"), float)
-            if Tt is not None:
-                meta["recording"]["recording_time_s"] = round(Tt, 2)
 
         if meta["roi"]["center_x_px"] is None:
             roi_c = _parse_roi_center(exp_row.get("ROI_center"))
@@ -421,16 +416,24 @@ def process_single_pkl(pkl_path, config):
 
         # Select the columns of interest
         # The .pkl always has: frame, track, x, y, r, vx, vy, theta, w; we keep: frame, track, x, y, theta
-        selected_cols = ["frame", "track", "x", "y", "theta", "w", "vx", "vy"]
+        selected_cols = ["frame", "track", "x", "y", "theta"]
         df = df[selected_cols].copy()
 
-        # Convert theta from blades to radians, w from blades/frame to rad/s.
+        # Convert theta from blades to radians; w is recomputed from raw theta as d(theta)/dt in rad/s (positive = counter-clockwise).
         # fps always comes from the actual experiment row in the .ods table.
         fps = int(exp_row["fps"])
         BLADES_PER_REVOLUTION = 14
         factor = 2 * np.pi / BLADES_PER_REVOLUTION
         df["theta"] = df["theta"] * factor
-        df["w"] = df["w"] * factor * fps
+
+        df["w"] = np.nan
+        for _track, _data in df.groupby("track", sort=False):
+            _data = _data.sort_values("frame")
+            if len(_data) < 2:
+                continue
+            _frames = _data["frame"].values.astype(float)
+            _theta = np.unwrap(_data["theta"].values, period=2 * np.pi)
+            df.loc[_data.index, "w"] = np.gradient(_theta, _frames / fps)
 
         # Rename: track -> particle (as requested in Appendix I)
         df.rename(columns={"track": "particle"}, inplace=True)
@@ -458,17 +461,18 @@ def process_single_pkl(pkl_path, config):
         v_values = []
         for particle_id in df["particle"].unique():
             mask = df["particle"] == particle_id
-            data = df.loc[mask]
+            data = df.loc[mask].sort_values("frame")
+            if len(data) < 2:
+                continue
             theta = data["theta"].values
             w = data["w"].values
             x = data["x"].values
             y = data["y"].values
-            vx = data["vx"].values
-            vy = data["vy"].values
+            time_s = data["frame"].values.astype(float) / fps
 
             w_values.extend(w)
 
-            v = np.sqrt(vx**2 + vy**2)
+            v = np.hypot(np.gradient(x, time_s), np.gradient(y, time_s))
             v_values.extend(v)
 
             # Dr: subtract mean rotation before MSAD
@@ -493,8 +497,10 @@ def process_single_pkl(pkl_path, config):
                     if dr > 0:
                         dr_values.append(dr)
 
-        w_values = np.array(w_values)
-        v_values = np.array(v_values)
+        w_values = np.asarray(w_values, dtype=float)
+        v_values = np.asarray(v_values, dtype=float)
+        w_values = w_values[~np.isnan(w_values)]
+        v_values = v_values[~np.isnan(v_values)]
         metrics["mean_angular_velocity"] = float(np.mean(w_values))
         metrics["std_angular_velocity"] = float(np.std(w_values))
         metrics["net_chirality"] = float(np.mean(np.sign(w_values)))

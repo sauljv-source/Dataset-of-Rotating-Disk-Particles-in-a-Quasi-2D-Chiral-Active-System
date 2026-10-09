@@ -1,0 +1,12 @@
+{
+  "mean_angular_velocity": 129.9934355158559,
+  "std_angular_velocity": 5.221939564121512,
+  "net_chirality": 0.9998932265598932,
+  "abs_mean_w": 130.00038448076754,
+  "mean_speed_px_per_s": 71.44145734585048,
+  "n_particles": 3,
+  "n_frames": 24975,
+  "fps": 900,
+  "curvature_radius_px": 0.5495480465784287,
+  "rotational_diffusion_coefficient": 0.5874905668061577
+}

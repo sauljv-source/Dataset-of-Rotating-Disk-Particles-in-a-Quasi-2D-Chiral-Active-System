@@ -22,7 +22,7 @@ One step at a time:
   python processed_data/pipeline.py --input_dir "..\raw_data"   (generates csv, metadata and metrics for each experiment)
   python graphics/statics_graphics.py                           (generates png plots: trajectories, radial distribution, density map, chirality)
   python graphics/animate_graphic.py                            (generates mp4 video of particles moving over time)
-  python zenodo/post_zenodo.py                                  (uploads csvs and metadata to Zenodo Sandbox)
+  python zenodo/post_zenodo.py                                  (builds one zip with all csvs and metadata and uploads it to Zenodo Sandbox)
 
 raw_data has the .pkl files.
 processed_data has the csvs, plots and metrics.
