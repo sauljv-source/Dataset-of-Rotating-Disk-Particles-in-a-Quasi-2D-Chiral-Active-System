@@ -1,13 +1,18 @@
 '''
-Takes raw .pkl data files, extracts relevant columns (frame, particle, x, y, theta).
-Calculates angular velocity metrics, generates the clean CSV, metadata, and metrics.
+Takes raw .pkl data files and generates the clean CSV, metadata, and metrics.
 
-The .pkl files always have the same 9 columns: frame, track, x, y, r, vx, vy, theta, w.
+There are two kinds of experiments:
 
-The output CSV has only 5: frame, particle, x, y, theta.
+- Angular + translational (900 fps): the .pkl has 9 columns
+  (frame, track, x, y, r, vx, vy, theta, w). The output CSV has 5 columns
+  (frame, particle, x, y, theta) and the angular velocity w is computed from
+  theta (positive = counter-clockwise). w is not included in the CSV (it is not
+  a measured value); it is saved separately as a {experiment}_angular_velocity.npy
+  file, which is needed for the chirality plots.
 
-The angular velocity w is not included in the CSV (it is not a measured value, but calculated using a Savitzky–Golay smoothing filter).
-We save it separately as a {experiment}_angular_velocity.npy file in the experiment's folder. We save it because we need it for the plots.
+- Translational (250 fps): the .pkl has only 4 columns (frame, track, x, y),
+  with no angular information at all. The output CSV has 4 columns
+  (frame, particle, x, y): no theta and no angular velocity file are generated.
 '''
 
 import json
@@ -70,7 +75,7 @@ def lookup_experiment(pkl_path, table):
     raise ValueError(f"Duplicate rows in the experiments table for ID: {stem}")
 
 
-def discover_pkl_files(input_dir, pattern="*_w.pkl", max_files=None):
+def discover_pkl_files(input_dir, pattern="*.pkl", max_files=None):
     input_path = Path(input_dir)
     if not input_path.is_dir():
         raise FileNotFoundError(f"Directory does not exist: {input_dir}")
@@ -145,7 +150,8 @@ def _safe(v, cast=None, default=None):
 def build_experiment_metadata(
     pkl_meta,
     exp_row,
-    fair_filename
+    fair_filename,
+    has_angular=True
 ):
     # Common data from any source
     def _from_either(key_txt, key_ods=None, cast_txt=None):
@@ -175,12 +181,21 @@ def build_experiment_metadata(
         f"Chiral active fluid of rotating disks: trajectory data of N={N_str} particles "
         f"in a circular confinement at packing fraction {phi_str}"
     )
-    description = (
-        f"Trajectory data from a chiral active fluid experiment with {shape_str} particles "
-        f"driven by air flow. The dataset contains particle positions (x, y) and "
-        f"orientation angle (theta) for N={N_str} particles "
-        f"at packing fraction {phi_str}. "
-    )
+    if has_angular:
+        description = (
+            f"Trajectory data from a chiral active fluid experiment with {shape_str} particles "
+            f"driven by air flow. The dataset contains particle positions (x, y) and "
+            f"orientation angle (theta) for N={N_str} particles "
+            f"at packing fraction {phi_str}. "
+        )
+    else:
+        description = (
+            f"Trajectory data from a chiral active fluid experiment with {shape_str} particles "
+            f"driven by air flow. The dataset contains particle positions (x, y) for "
+            f"N={N_str} particles at packing fraction {phi_str}. "
+            f"This experiment was recorded at a low frame rate and therefore contains only "
+            f"translational information (no orientation angle theta and no angular velocity). "
+        )
     if fps_val:
         description += f"Recordings were performed at {fps_val} fps using a high-speed camera. "
     description += (
@@ -295,6 +310,11 @@ def build_experiment_metadata(
             "code_repository": "",
         },
     }
+
+    # Translational experiments have no orientation angle
+    if not has_angular:
+        meta["units"].pop("theta", None)
+    meta["has_angular_data"] = has_angular
 
     # Populate from pkl_meta (.txt)
     
@@ -414,29 +434,47 @@ def process_single_pkl(pkl_path, config):
         # Load the pickle
         df = pd.read_pickle(pkl_path)
 
+        has_angular = "theta" in df.columns
+        fps = int(exp_row["fps"])
+
         # Select the columns of interest
-        # The .pkl always has: frame, track, x, y, r, vx, vy, theta, w; we keep: frame, track, x, y, theta
-        selected_cols = ["frame", "track", "x", "y", "theta"]
+        # Angular .pkl: frame, track, x, y, r, vx, vy, theta, w -> keep frame, track, x, y, theta
+        # Translational-only .pkl: frame, track, x, y -> keep frame, track, x, y
+        selected_cols = ["frame", "track", "x", "y"] + (["theta"] if has_angular else [])
         df = df[selected_cols].copy()
 
-        # Convert theta from blades to radians; w is recomputed from raw theta as d(theta)/dt in rad/s (positive = counter-clockwise).
-        # fps always comes from the actual experiment row in the .ods table.
-        fps = int(exp_row["fps"])
-        BLADES_PER_REVOLUTION = 14
-        factor = 2 * np.pi / BLADES_PER_REVOLUTION
-        df["theta"] = df["theta"] * factor
+        if not has_angular:
+            center = None
+            if pkl_meta is not None and pkl_meta.get("ROI_center"):
+                center = pkl_meta["ROI_center"]
+            if center is None and exp_row is not None:
+                center = _parse_roi_center(exp_row.get("ROI_center"))
+            if not center or len(center) < 2:
+                raise RuntimeError(f"No ROI center available to center coordinates for {pkl_path.name}")
+            df["x"] = df["x"] - float(center[0])
+            df["y"] = df["y"] - float(center[1])
 
-        df["w"] = np.nan
-        for _track, _data in df.groupby("track", sort=False):
-            _data = _data.sort_values("frame")
-            if len(_data) < 2:
-                continue
-            _frames = _data["frame"].values.astype(float)
-            _theta = np.unwrap(_data["theta"].values, period=2 * np.pi)
-            df.loc[_data.index, "w"] = np.gradient(_theta, _frames / fps)
+        if has_angular:
+            # Convert theta from blades to radians; w is recomputed from raw theta
+            # as d(theta)/dt in rad/s (positive = counter-clockwise).
+            BLADES_PER_REVOLUTION = 14
+            factor = 2 * np.pi / BLADES_PER_REVOLUTION
+            df["theta"] = df["theta"] * factor
+
+            df["w"] = np.nan
+            for _track, _data in df.groupby("track", sort=False):
+                _data = _data.sort_values("frame")
+                if len(_data) < 2:
+                    continue
+                _frames = _data["frame"].values.astype(float)
+                _theta = np.unwrap(_data["theta"].values, period=2 * np.pi)
+                df.loc[_data.index, "w"] = np.gradient(_theta, _frames / fps)
 
         # Rename: track -> particle (as requested in Appendix I)
         df.rename(columns={"track": "particle"}, inplace=True)
+
+        # Order rows by particle
+        df = df.sort_values(["particle", "frame"]).reset_index(drop=True)
 
         # Generate FAIR CSV name
         csv_name = generate_fair_filename(exp_row, config)
@@ -446,12 +484,14 @@ def process_single_pkl(pkl_path, config):
         exp_dir_path.mkdir(parents=True, exist_ok=True)
         csv_path = exp_dir_path / csv_name
 
-        # Save w separately and then the CSV
+        # Save w separately (only for angular experiments) and then the CSV
         metrics_dir_path = Path(config["output_metrics"]) / exp_stem
         metrics_dir_path.mkdir(parents=True, exist_ok=True)
-        w_path = metrics_dir_path / f"{exp_stem}_angular_velocity.npy"
-        np.save(w_path, df["w"].values)
-        df[["frame", "particle", "x", "y", "theta"]].to_csv(csv_path, index=False, float_format="%.15g")
+        if has_angular:
+            w_path = metrics_dir_path / f"{exp_stem}_angular_velocity.npy"
+            np.save(w_path, df["w"].values)
+        out_cols = ["frame", "particle", "x", "y"] + (["theta"] if has_angular else [])
+        df[out_cols].to_csv(csv_path, index=False, float_format="%.15g")
 
         # Calculate metrics
         metrics = {}
@@ -464,16 +504,19 @@ def process_single_pkl(pkl_path, config):
             data = df.loc[mask].sort_values("frame")
             if len(data) < 2:
                 continue
-            theta = data["theta"].values
-            w = data["w"].values
             x = data["x"].values
             y = data["y"].values
             time_s = data["frame"].values.astype(float) / fps
 
-            w_values.extend(w)
-
             v = np.hypot(np.gradient(x, time_s), np.gradient(y, time_s))
             v_values.extend(v)
+
+            if not has_angular:
+                continue
+
+            theta = data["theta"].values
+            w = data["w"].values
+            w_values.extend(w)
 
             # Dr: subtract mean rotation before MSAD
             unwrapped_theta = np.unwrap(theta, period=2 * np.pi)
@@ -497,30 +540,34 @@ def process_single_pkl(pkl_path, config):
                     if dr > 0:
                         dr_values.append(dr)
 
-        w_values = np.asarray(w_values, dtype=float)
         v_values = np.asarray(v_values, dtype=float)
-        w_values = w_values[~np.isnan(w_values)]
         v_values = v_values[~np.isnan(v_values)]
-        metrics["mean_angular_velocity"] = float(np.mean(w_values))
-        metrics["std_angular_velocity"] = float(np.std(w_values))
-        metrics["net_chirality"] = float(np.mean(np.sign(w_values)))
-        metrics["abs_mean_w"] = float(np.mean(np.abs(w_values)))
+
+        if has_angular:
+            w_values = np.asarray(w_values, dtype=float)
+            w_values = w_values[~np.isnan(w_values)]
+            metrics["mean_angular_velocity"] = float(np.mean(w_values))
+            metrics["std_angular_velocity"] = float(np.std(w_values))
+            metrics["net_chirality"] = float(np.mean(np.sign(w_values)))
+            metrics["abs_mean_w"] = float(np.mean(np.abs(w_values)))
+
         metrics["mean_speed_px_per_s"] = float(np.mean(v_values))
         metrics["n_particles"] = int(df["particle"].nunique())
         metrics["n_frames"] = int(df["frame"].nunique())
         metrics["fps"] = fps
 
-        # Curvature radius: <|v|> / <|w|>
-        mean_v = float(np.mean(v_values))
-        mean_abs_w = float(np.mean(np.abs(w_values)))
-        curvature_radius = mean_v / mean_abs_w if mean_abs_w > 0 else None
-        if curvature_radius is not None:
-            metrics["curvature_radius_px"] = curvature_radius
+        if has_angular:
+            # Curvature radius: <|v|> / <|w|>
+            mean_v = float(np.mean(v_values))
+            mean_abs_w = float(np.mean(np.abs(w_values)))
+            curvature_radius = mean_v / mean_abs_w if mean_abs_w > 0 else None
+            if curvature_radius is not None:
+                metrics["curvature_radius_px"] = curvature_radius
 
-        # Rotational diffusion coefficient
-        mean_dr = float(np.mean(dr_values)) if dr_values else None
-        if mean_dr is not None:
-            metrics["rotational_diffusion_coefficient"] = mean_dr
+            # Rotational diffusion coefficient
+            mean_dr = float(np.mean(dr_values)) if dr_values else None
+            if mean_dr is not None:
+                metrics["rotational_diffusion_coefficient"] = mean_dr
 
         # Save metrics
         metrics_path = metrics_dir_path / f"{exp_stem}_metrics.json"
@@ -532,6 +579,7 @@ def process_single_pkl(pkl_path, config):
             pkl_meta=pkl_meta,
             exp_row=config.get("_exp_row"),
             fair_filename=csv_name,
+            has_angular=has_angular,
         )
         meta_path = exp_dir_path / f"{exp_stem}_metadata.json"
         with open(meta_path, "w", encoding="utf-8") as f:
@@ -578,7 +626,7 @@ def run(input_dir, output_dir=None, force=False, max_files=None):
         print(f"Experiments table not found in {ods_path}")
 
     try:
-        pkls = discover_pkl_files(input_dir, "*_w.pkl", max_files)
+        pkls = discover_pkl_files(input_dir, "*.pkl", max_files)
     except FileNotFoundError as e:
         print(str(e))
         exit(1)

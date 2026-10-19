@@ -1,7 +1,7 @@
 {
   "metadata": {
     "title": "Experimental Trajectory Dataset of Rotating Disk Particles in a Quasi-2D Chiral Active Fluid",
-    "description": "Comprehensive trajectory dataset from quasi-2D chiral active fluid experiments featuring chiral rotating disk particles driven by bottom air flow.\n\nThe dataset includes:\n- Particle positions (x, y) and orientation angle (theta) in radians for each experiment.\n- Variations in particle count (N), packing fraction (phi) and recording frame rate (FPS).\n- One CSV trajectory file and one metadata JSON file per experiment, all packed in a single ZIP archive.\n\nTracking and analysis code is available on GitHub, linked in Related identifiers.",
+    "description": "<p>Comprehensive trajectory dataset from quasi-2D chiral active fluid experiments featuring chiral rotating disk particles driven by bottom air flow.</p><p>The dataset includes:</p><ul><li>Particle positions (x, y) for each experiment, plus the orientation angle (theta) in radians for the 900 fps experiments. The 250 fps experiments contain only translational data (x, y), with no angular information.</li><li>Variations in particle count (N), packing fraction (phi) and recording frame rate (FPS).</li><li>One CSV trajectory file and one metadata JSON file per experiment, all packed in a single ZIP archive.</li></ul><p>Tracking and analysis code is available on <a href=\"https://github.com/sauljv-source/Dataset-of-Rotating-Disk-Particles-in-a-Quasi-2D-Chiral-Active-System\">GitHub</a>, linked in Related identifiers.</p>",
     "access_right": "open",
     "upload_type": "dataset",
     "license": "cc-by-4.0",
@@ -37,7 +37,7 @@
       }
     ],
     "publication_date": "2026-10-01",
-    "notes": "This deposit contains multiple experiments. Each experiment has a CSV trajectory file and a metadata JSON file, both identified by a unique experiment ID in the filename. All files are provided as a single ZIP archive.",
+    "notes": "<p>This deposit contains multiple experiments. Each experiment has a CSV trajectory file and a metadata JSON file, both identified by a unique experiment ID in the filename. The dataset combines 900 fps experiments (positions x, y and orientation theta) and 250 fps experiments (positions x, y only, no angular information); each metadata JSON flags this with the 'has_angular_data' field. All files are provided as a single ZIP archive.</p>",
     "related_identifiers": [
       {
         "relation": "isSupplementTo",

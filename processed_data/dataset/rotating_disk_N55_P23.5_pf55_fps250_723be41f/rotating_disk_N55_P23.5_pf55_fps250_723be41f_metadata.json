@@ -1,0 +1,118 @@
+{
+  "metadata": {
+    "title": "Chiral active fluid of rotating disks: trajectory data of N=55 particles in a circular confinement at packing fraction 0.55",
+    "description": "Trajectory data from a chiral active fluid experiment with rotating disk particles driven by air flow. The dataset contains particle positions (x, y) for N=55 particles at packing fraction 0.55. This experiment was recorded at a low frame rate and therefore contains only translational information (no orientation angle theta and no angular velocity). Recordings were performed at 250 fps using a high-speed camera. The data is provided in CSV format with one file per experimental condition. The confinement is circular with a diameter of 0.725 m.",
+    "access_right": "open",
+    "upload_type": "dataset",
+    "license": "cc-by-4.0",
+    "language": "eng",
+    "keywords": [
+      "active matter",
+      "chiral active matter",
+      "chiral fluids",
+      "active chiral fluids",
+      "active spinners",
+      "chiral spinners",
+      "rotating disks",
+      "particle tracking",
+      "packing fraction",
+      "quasi-2D",
+      "trajectory data",
+      "macroscopic active matter",
+      "soft matter"
+    ],
+    "creators": [
+      {
+        "name": "Jimenez Vela, Saul",
+        "affiliation": "Universidad de Extremadura",
+        "orcid": "0009-0002-2923-7047"
+      }
+    ],
+    "contributors": [
+      {
+        "name": "Vega Reyes, Francisco",
+        "affiliation": "Universidad de Extremadura",
+        "type": "Supervisor",
+        "orcid": ""
+      }
+    ],
+    "references": [],
+    "publication_date": "",
+    "doi": "",
+    "experiment_id": "rotating_disk_N55_P23.5_pf55_fps250_723be41f_trajectories",
+    "date_recorded": "2038-01-19 11:09:47",
+    "recording": {
+      "original_filename": "serieAspas_N55_p235_fps250_2.cine",
+      "frame_width_px": 1280,
+      "frame_height_px": 800,
+      "fps": 250,
+      "exposure": 1500,
+      "exposure_units": "microseconds",
+      "n_frames": 24981,
+      "recording_time_s": 99.92
+    },
+    "camera": {
+      "model": "",
+      "distance_m": 0.95,
+      "pixel_ratio_px_per_m": 1075.86
+    },
+    "optics": {
+      "illumination_type": "far diffuse light",
+      "illumination_power": 23,
+      "illumination_power_units": "watts"
+    },
+    "particles": {
+      "N": 55,
+      "shape": "rotating disk",
+      "material": "",
+      "diameter_px": 78,
+      "diameter_m": 0.0725
+    },
+    "system": {
+      "confinement_shape": "circle",
+      "system_diameter_m": 0.725,
+      "packing_fraction": 0.55,
+      "boundary_conditions": "solid wall (no-slip)"
+    },
+    "medium": {
+      "viscosity_pas": null,
+      "temperature_k": null,
+      "confinement_height_m": null
+    },
+    "air_flow": {
+      "description": "air flow from below to fluidize particles (2.6532 m/s)",
+      "pressure": "",
+      "flow_rate": "",
+      "flow_rate_units": ""
+    },
+    "roi": {
+      "center_x_px": 656,
+      "center_y_px": 395,
+      "radius_px": 408,
+      "origin": "top-left corner of frame"
+    },
+    "tracking": {
+      "method": "centroid-based tracking",
+      "spatial_resolution_m_per_px": 0.000929,
+      "temporal_resolution_fps": 250,
+      "total_observation_time_s": 99.92,
+      "n_trajectories": 55,
+      "localization_error_px": "",
+      "trajectory_completeness_pct": ""
+    },
+    "units": {
+      "position": "pixels (relative to ROI center)",
+      "time": "seconds (frame / fps)"
+    },
+    "quality_indicators": {
+      "mean_trajectory_length_frames": 24981,
+      "signal_to_noise_ratio": "",
+      "boundary_artifact_zones": ""
+    },
+    "associated_files": {
+      "trajectory_file": "rotating_disk_N55_P23.5_pf55_fps250_723be41f_trajectories.csv",
+      "code_repository": ""
+    },
+    "has_angular_data": false
+  }
+}

@@ -113,6 +113,7 @@
     "associated_files": {
       "trajectory_file": "rotating_disk_N55_P22_pf55_fps900_5e173d94_trajectories.csv",
       "code_repository": ""
-    }
+    },
+    "has_angular_data": true
   }
 }

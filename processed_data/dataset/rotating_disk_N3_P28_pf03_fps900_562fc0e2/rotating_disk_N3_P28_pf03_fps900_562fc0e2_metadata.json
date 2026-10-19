@@ -113,6 +113,7 @@
     "associated_files": {
       "trajectory_file": "rotating_disk_N3_P28_pf03_fps900_562fc0e2_trajectories.csv",
       "code_repository": ""
-    }
+    },
+    "has_angular_data": true
   }
 }

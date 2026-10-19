@@ -196,6 +196,9 @@ def run(csv_path, output_dir=None, step=30, trail_length=50, fps_output=30, max_
     part_radius = meta["part_radius"]
     fps = meta["fps"]
 
+    step = max(1, round(fps / 30)) 
+    fps_output = fps / step
+
     make_animation_bodies_tracked(df, output_dir, filename="animation_bodies_tracked.mp4", step=step, trail_length=trail_length, fps_input=fps, fps_output=fps_output, max_frames=max_frames, roi_radius=roi_radius, part_radius=part_radius)
 
     if not quiet:

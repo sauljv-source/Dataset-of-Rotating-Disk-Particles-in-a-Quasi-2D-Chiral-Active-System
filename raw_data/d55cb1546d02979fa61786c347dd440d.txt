@@ -1,0 +1,29 @@
+{
+"experiment_id": "d55cb1546d02979fa61786c347dd440d",
+"original_file": "D:/serieAspas/relleno_mapa_fases2\\serieAspas_N45_p22_fps250_Y20201218_H132522.cine",
+"date": "2020-12-18 13:25:22",
+"shape": [
+1280,
+800
+],
+"fps": 250,
+"exposure": 1500,
+"n_frames": 24981,
+"recording_time": 99.924,
+"camera_distance": 0.924,
+"pixel_ratio": 1020.6896551724138,
+"particle_diameter_px": 74,
+"N": 45,
+"particle_shape": "rotating disk",
+"particle_diameter_m": 0.0725,
+"system_diameter": 0.725,
+"packing_fraction": 0.44999999999999996,
+"lights": "luzLejana",
+"power": 22,
+"associated_code": "D:/serieAspas/relleno_mapa_fases2/d55cb1546d02979fa61786c347dd440d_code.zip",
+"ROI_center": [
+662,
+383
+],
+"ROI_radius": 381
+}

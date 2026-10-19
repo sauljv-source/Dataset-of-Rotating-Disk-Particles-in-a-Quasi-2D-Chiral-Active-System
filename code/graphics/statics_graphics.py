@@ -9,6 +9,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+from matplotlib.colors import PowerNorm
 from matplotlib.lines import Line2D
 from scipy.stats import gaussian_kde
 
@@ -140,7 +141,7 @@ def plot_radial_distribution(df, output_dir, roi_radius, part_radius):
 def plot_density_map(df, output_dir, roi_radius, part_radius):
     fig, ax = plt.subplots(1, 1, figsize=(10, 9))
     eff_radius = roi_radius - part_radius
-    sampled = df.iloc[::5]
+    sampled = df
 
     fig.patch.set_facecolor("#0f0f0f")
     ax.set_facecolor("#110b1a")
@@ -148,7 +149,7 @@ def plot_density_map(df, output_dir, roi_radius, part_radius):
     limit = roi_radius * 1.1
     ax.set_xlim(-limit, limit)
     ax.set_ylim(-limit, limit)
-    h = ax.hexbin(sampled["x"], sampled["y"], gridsize=80, cmap="inferno", linewidths=0.05, extent=[-limit, limit, -limit, limit], mincnt=0)
+    h = ax.hexbin(sampled["x"], sampled["y"], gridsize=80, cmap="inferno", linewidths=0.05, extent=[-limit, limit, -limit, limit], mincnt=0, norm=PowerNorm(0.4))
     cbar = fig.colorbar(h, ax=ax, shrink=0.8)
     cbar.set_label("N of visits (counts)", color="white")
     cbar.ax.tick_params(labelsize=9, colors="white")
@@ -278,14 +279,18 @@ def run(csv_path, output_dir=None, quiet=False):
     csv_dir = csv_path.parent
     base = csv_path.parents[2]
     exp_name = csv_dir.name
-    w_path = base / "metrics" / exp_name / f"{exp_name}_angular_velocity.npy"
-    if w_path.exists():
-        w = np.load(w_path)
-        if len(w) != len(df):
-            raise ValueError(f"Dimension error: len(w)={len(w)} does not match len(df)={len(df)}")
+    if "theta" in df.columns:
+        w_path = base / "metrics" / exp_name / f"{exp_name}_angular_velocity.npy"
+        if w_path.exists():
+            w = np.load(w_path)
+            if len(w) != len(df):
+                raise ValueError(f"Dimension error: len(w)={len(w)} does not match len(df)={len(df)}")
+        else:
+            raise FileNotFoundError(f"Filtered angular velocity file '{w_path}' does not exist.")
+        plot_chirality_metrics(w, df, output_dir, fps)
     else:
-        raise FileNotFoundError(f"Filtered angular velocity file '{w_path}' does not exist.")
-    plot_chirality_metrics(w, df, output_dir, fps)
+        if not quiet:
+            print(f"Translational-only experiment (no theta): skipping chirality plot for {exp_name}.")
 
     if not quiet:
         print(f"\nAll static plots generated in: {output_dir}")

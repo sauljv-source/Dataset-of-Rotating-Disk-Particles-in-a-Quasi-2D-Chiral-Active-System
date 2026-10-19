@@ -1,6 +1,9 @@
 TFG project: tracking data from rotating disk particles in a quasi-2D chiral active fluid. Particles are fluidized with air flow and recorded with a high-speed camera.
 
-Each experiment gives you a csv (frame, particle, x, y, theta) and a json with metadata.
+Each experiment gives you a csv and a json with metadata. There are two kinds of experiments:
+
+- Angular + translational (900 fps): csv has (frame, particle, x, y, theta).
+- Translational (250 fps): csv has (frame, particle, x, y); these recordings are too slow to resolve the rotation of the disks, so they have no theta and no angular metrics/plots.
 
 Csv and json file names include the experiment parameters:
 
@@ -20,7 +23,7 @@ To run everything:
 
 One step at a time:
   python processed_data/pipeline.py --input_dir "..\raw_data"   (generates csv, metadata and metrics for each experiment)
-  python graphics/statics_graphics.py                           (generates png plots: trajectories, radial distribution, density map, chirality)
+  python graphics/statics_graphics.py                           (generates png plots: trajectories, radial distribution, density map, and chirality for angular experiments)
   python graphics/animate_graphic.py                            (generates mp4 video of particles moving over time)
   python zenodo/post_zenodo.py                                  (builds one zip with all csvs and metadata and uploads it to Zenodo Sandbox)
 

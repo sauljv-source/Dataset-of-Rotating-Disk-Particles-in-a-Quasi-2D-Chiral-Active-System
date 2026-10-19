@@ -1,0 +1,29 @@
+{
+"experiment_id": "5ac8543758342346a52402e578bfaf41",
+"original_file": "D:/serieAspas/renivelado/movies\\serieAspas_N45_p20_fps250_est_renivel.cine",
+"date": "2038-01-19 04:33:20",
+"shape": [
+1280,
+800
+],
+"fps": 250,
+"exposure": 1500,
+"n_frames": 24981,
+"recording_time": 99.924,
+"camera_distance": 0.95,
+"pixel_ratio": 1075.8620689655172,
+"particle_diameter_px": 78,
+"N": 45,
+"particle_shape": "rotating disk",
+"particle_diameter_m": 0.0725,
+"system_diameter": 0.725,
+"packing_fraction": 0.44999999999999996,
+"lights": "luzLejana",
+"power": 20,
+"associated_code": "D:/serieAspas/renivelado/movies/5ac8543758342346a52402e578bfaf41_code.zip",
+"ROI_center": [
+656,
+395
+],
+"ROI_radius": 408
+}

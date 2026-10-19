@@ -113,6 +113,7 @@
     "associated_files": {
       "trajectory_file": "rotating_disk_N3_P20_pf03_fps900_e2560143_trajectories.csv",
       "code_repository": ""
-    }
+    },
+    "has_angular_data": true
   }
 }
